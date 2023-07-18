@@ -37,7 +37,6 @@ def secret(request):
 
         # # Store the link and associated secret key in the database
         # SecretLink.objects.create(link_id=link_id, secret_key=secret_key, expiration_time=expiration_time)
-
         # # Construct the link URL
         link_url = request.build_absolute_uri('/') + 'secret/' + link_id
 
