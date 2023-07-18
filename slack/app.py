@@ -16,11 +16,26 @@ app = App(
 # Add functionality here
 # @app.event("app_home_opened") etc
 
+def send_response(response_url, message):
+    payload = {
+        'text': message,
+        'response_type': 'in_channel'  # Set to 'ephemeral' for a private response
+    }
+    requests.post(response_url, json=payload)
+
+# Example usage
+ 
+
+
+
+
+
+
 @app.command("/secret")
-def handle_hello_command(ack, body, say):
+def handle_hello_command(ack, body, respond,say):
     # Acknowledge the command request
     ack()
-
+    
     # Define the URL of the server you want to send the request to
     server_url = "http://127.0.0.1:8000/secret/"
 
@@ -38,10 +53,12 @@ def handle_hello_command(ack, body, say):
     # Check the response status code
     if response.status_code == 200:
         print("Request sent successfully")
-        say(json.loads(response.text)['text'])
-        
+        response_url =body['response_url']
+        send_response(response_url,json.loads(response.text)['text'] )
     else:
         print(f"Request failed with status code: {response.status_code}, {response.text}")
+
+
 
 
 # Start your app
