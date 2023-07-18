@@ -42,7 +42,7 @@ def secret(request):
 
         # # Prepare the response to Slackbot
         response = {
-            'text': f"Your secret link: {link_url}",
+            'text': f"{person} shared a secret link : {link_url}\nUse within 15 minutes",
         }
         return JsonResponse(response)
     return JsonResponse({'message': 'Invalid request'}) 
@@ -50,13 +50,7 @@ def secret(request):
 
 def access_secret(request, link_id):
 
-    secret_link = get_object_or_404(SecretLink, link_id=link_id)
-
-    # Check if the link has expired
-
-    # sr=datetime.strftime(secret_link.expiration_time,'%Y-%m-%d %H:%M:%S.%f')
-    # new=datetime.strptime(sr,'%Y-%m-%d %H:%M:%S.%f')
-    
+    secret_link = get_object_or_404(SecretLink, link_id=link_id)    
 
     if secret_link.expiration_time < timezone.now():
         return render(request, 'expired.html')
