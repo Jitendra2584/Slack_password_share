@@ -6,7 +6,7 @@ load_dotenv()
 import json
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import requests
-
+from cryptography.fernet import Fernet
 # Initializes your app with your bot token and signing secret
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
@@ -26,11 +26,6 @@ def send_response(response_url, message):
 # Example usage
  
 
-
-
-
-
-
 @app.command("/secret")
 def handle_hello_command(ack, body, respond,say):
     # Acknowledge the command request
@@ -38,10 +33,18 @@ def handle_hello_command(ack, body, respond,say):
     
     # Define the URL of the server you want to send the request to
     server_url = "http://127.0.0.1:8000/secret/"
+    # print(body)
+    person=body['user_name']
+
+    secret_key=body['text']
+    cipher_suite = Fernet(os.getenv('fernet_key').encode())
+    encoded_secret_key = cipher_suite.encrypt(secret_key.encode())
+    str_data = encoded_secret_key.decode('utf-8')
 
     # Define the payload data to send with the request
     payload = {
-        "key1": body,
+        "key1": str_data,
+        "username":person
     }
     # Set up the headers with the shared secret
     headers = {

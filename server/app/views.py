@@ -21,19 +21,16 @@ from cryptography.fernet import Fernet
 @validate_secret
 def secret(request):
     if request.method == 'POST':
-        secret_key=json.loads(request.body)['key1']['text']
-        person=json.loads(request.body)['key1']['user_name']
+        
+        secret_key=json.loads(request.body)['key1'].encode()
+        person=json.loads(request.body)['username']
         # secret_key = request.POST.get('text')
 
         # Generate a unique link with a 15-minute expiration time
         link_id = secrets.token_urlsafe()
         expiration_time = timezone.now() + timedelta(minutes=15)
-        cipher_suite = Fernet(SecretLink.get_secret_key(os.getenv('fernet_key')))
-        encoded_secret_key = cipher_suite.encrypt(secret_key.encode())
-
-
         # Store the link and encoded secret key in the database
-        SecretLink.objects.create(link_id=link_id, encoded_secret_key=encoded_secret_key, expiration_time=expiration_time)
+        SecretLink.objects.create(link_id=link_id, encoded_secret_key=secret_key, expiration_time=expiration_time)
 
         # # Store the link and associated secret key in the database
         # SecretLink.objects.create(link_id=link_id, secret_key=secret_key, expiration_time=expiration_time)
@@ -44,6 +41,7 @@ def secret(request):
         response = {
             'text': f"{person} shared a secret link : {link_url}\nUse within 15 minutes",
         }
+        
         return JsonResponse(response)
     return JsonResponse({'message': 'Invalid request'}) 
 
